@@ -1,10 +1,10 @@
 export enum Command {
-    Map = 'map',
-    New = 'new',
-    Open = 'open',
+  Map = 'map',
+  New = 'new',
+  Open = 'open',
 }
 
 export enum Status {
-    Lose = 'You lose',
-    Success = 'OK',
+  Lose = 'You lose',
+  Success = 'OK',
 }

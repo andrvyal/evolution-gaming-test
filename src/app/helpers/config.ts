@@ -1,8 +1,8 @@
 export interface AppConfig extends CommonConfig {
-    production: boolean;
+  production: boolean;
 }
 
 export interface CommonConfig {
-    levelCount: number;
-    socketUrl: string;
+  levelCount: number;
+  socketUrl: string;
 }

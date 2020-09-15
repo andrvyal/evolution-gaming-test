@@ -4,14 +4,14 @@
 $backdrop-z-index: 10000;
 
 .backdrop {
-    @include position-absolute-fill();
+  @include position-absolute-fill();
 
-    background-color: $white;
-    opacity: .8;
-    z-index: $backdrop-z-index;
+  background-color: $white;
+  opacity: .8;
+  z-index: $backdrop-z-index;
 }
 
 .spinner {
-    @include position-absolute-center();
-    z-index: ($backdrop-z-index + 1);
+  @include position-absolute-center();
+  z-index: ($backdrop-z-index + 1);
 }

@@ -5,49 +5,49 @@ $cell-size: 1.75rem;
 $cell-z-index: 0;
 
 .intro {
-    margin-right: 1.25rem;
+  margin-right: 1.25rem;
 }
 
 .grid {
-    display: inline-block;
+  display: inline-block;
 }
 
 .line {
-    display: flex;
+  display: flex;
 
-    & ~ & .cell {
-        margin-top: -$cell-border-size;
-    }
+  & ~ & .cell {
+    margin-top: -$cell-border-size;
+  }
 }
 
 .cell {
-    background-color: $white;
-    border: $cell-border-size solid $gray-1;
-    color: $gray-1;
-    height: $cell-size;
-    min-width: $cell-size;
-    overflow: hidden;
-    padding: 0;
-    position: relative;
-    text-align: center;
-    width: $cell-size;
-    z-index: $cell-z-index;
+  background-color: $white;
+  border: $cell-border-size solid $gray-1;
+  color: $gray-1;
+  height: $cell-size;
+  min-width: $cell-size;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  text-align: center;
+  width: $cell-size;
+  z-index: $cell-z-index;
 
-    & ~ & {
-        margin-left: -$cell-border-size;
-    }
+  & ~ & {
+    margin-left: -$cell-border-size;
+  }
 
-    &:not(:disabled) {
-        &:hover {
-            background-color: $gray-1;
-            border-color: $gray-1;
-            color: $white;
-            z-index: ($cell-z-index + 1);
-        }
+  &:not(:disabled) {
+    &:hover {
+      background-color: $gray-1;
+      border-color: $gray-1;
+      color: $white;
+      z-index: ($cell-z-index + 1);
     }
+  }
 
-    &:disabled {
-        cursor: not-allowed;
-        opacity: .5;
-    }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+  }
 }
