@@ -1,0 +1,33 @@
+<div *ngIf="ready" class="text-center">
+  <div *ngIf="!started">
+
+    <span class="intro">Please select a level:</span>
+
+    <div class="btn-group">
+      <button
+        *ngFor="let level of levels"
+        class="btn btn-secondary"
+        type="button"
+        (click)="start(level)"
+      >
+        {{level}}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="started">
+    <div class="grid">
+      <div *ngFor="let line of grid; let rowIndex = index" class="line">
+        <button
+          *ngFor="let cell of line; let colIndex = index"
+          class="cell"
+          type="button"
+          [disabled]="lose"
+          (click)="open(rowIndex, colIndex)"
+        >
+          {{cell}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
