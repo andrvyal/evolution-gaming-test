@@ -37,7 +37,7 @@ export class MinesweeperComponent implements OnInit {
     }
   }
 
-  async open(row: number, col: number): Promise<void> {
+  async open([row, col]: Array<number>): Promise<void> {
     this.spinnerService.start();
 
     try {

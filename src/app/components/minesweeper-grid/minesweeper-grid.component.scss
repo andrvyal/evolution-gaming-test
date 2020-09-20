@@ -1,0 +1,49 @@
+@import '../../../styles/utils/palette';
+
+$cell-border-size: 1px;
+$cell-size: 1.75rem;
+$cell-z-index: 0;
+
+.grid {
+  display: inline-block;
+}
+
+.line {
+  display: flex;
+
+  & ~ & .cell {
+    margin-top: -$cell-border-size;
+  }
+}
+
+.cell {
+  background-color: $white;
+  border: $cell-border-size solid $gray-1;
+  color: $gray-1;
+  height: $cell-size;
+  min-width: $cell-size;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  text-align: center;
+  width: $cell-size;
+  z-index: $cell-z-index;
+
+  & ~ & {
+    margin-left: -$cell-border-size;
+  }
+
+  &:not(:disabled) {
+    &:hover {
+      background-color: $gray-1;
+      border-color: $gray-1;
+      color: $white;
+      z-index: ($cell-z-index + 1);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+  }
+}

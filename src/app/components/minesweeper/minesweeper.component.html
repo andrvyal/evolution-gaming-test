@@ -16,18 +16,10 @@
   </div>
 
   <div *ngIf="started">
-    <div class="grid">
-      <div *ngFor="let line of grid; let rowIndex = index" class="line">
-        <button
-          *ngFor="let cell of line; let colIndex = index"
-          class="cell"
-          type="button"
-          [disabled]="lose"
-          (click)="open(rowIndex, colIndex)"
-        >
-          {{cell}}
-        </button>
-      </div>
-    </div>
+    <egt-minesweeper-grid
+      [disabled]="lose"
+      [grid]="grid"
+      (cellOpen)="open($event)"
+    ></egt-minesweeper-grid>
   </div>
 </div>
