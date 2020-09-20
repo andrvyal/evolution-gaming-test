@@ -12,11 +12,11 @@ import { MinesweeperGridComponent } from './components/minesweeper-grid/mineswee
     AppComponent,
     MinesweeperComponent,
     SpinnerComponent,
-    MinesweeperGridComponent
+    MinesweeperGridComponent,
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

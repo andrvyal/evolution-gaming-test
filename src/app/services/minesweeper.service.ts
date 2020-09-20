@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Command, Status } from '../helpers/minesweeper';
+import { MinesweeperCell, MinesweeperCommand, MinesweeperStatus } from '../helpers/minesweeper';
 import { SocketApiService } from './socket-api.service';
 
 @Injectable({
@@ -18,11 +18,19 @@ export class MinesweeperService {
     return JSON.parse(JSON.stringify(this.map));
   }
 
+  isClosed(cell: string): boolean {
+    return cell === MinesweeperCell.Closed;
+  }
+
+  isMine(cell: string): boolean {
+    return cell === MinesweeperCell.Mine;
+  }
+
   async open(row: number, col: number): Promise<boolean> {
-    const response: string = await this.socketApiService.run(`${Command.Open} ${col} ${row}`);
+    const response: string = await this.socketApiService.run(`${MinesweeperCommand.Open} ${col} ${row}`);
     await this.retrieveMap();
 
-    const sussess: boolean = (response === `${Command.Open}: ${Status.Success}`);
+    const sussess: boolean = (response === `${MinesweeperCommand.Open}: ${MinesweeperStatus.Success}`);
 
     return sussess;
   }
@@ -32,7 +40,7 @@ export class MinesweeperService {
   }
 
   private async retrieveMap(): Promise<void> {
-    const mapResponse: string = await this.socketApiService.run(`${Command.Map}`);
+    const mapResponse: string = await this.socketApiService.run(`${MinesweeperCommand.Map}`);
     const mapLines: Array<string> = mapResponse.split('\n').slice(1, -1);
 
     this.map = mapLines.map((line: string) => {
@@ -44,9 +52,9 @@ export class MinesweeperService {
   }
 
   async start(level: number): Promise<void> {
-    const response: string = await this.socketApiService.run(`${Command.New} ${level}`);
+    const response: string = await this.socketApiService.run(`${MinesweeperCommand.New} ${level}`);
 
-    if (response !== `${Command.New}: ${Status.Success}`) {
+    if (response !== `${MinesweeperCommand.New}: ${MinesweeperStatus.Success}`) {
       return Promise.reject(response);
     }
 

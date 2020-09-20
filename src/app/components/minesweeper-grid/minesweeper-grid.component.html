@@ -4,6 +4,11 @@
       *ngFor="let cell of line; let colIndex = index"
       class="cell"
       type="button"
+      [ngClass]="{
+        'closed': isClosed(cell),
+        'open': !isClosed(cell),
+        'mine': isMine(cell)
+      }"
       [disabled]="disabled"
       (click)="open(rowIndex, colIndex)"
     >
