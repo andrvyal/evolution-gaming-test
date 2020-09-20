@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { environment } from '../../../environments/environment';
+import { MinesweeperStatus } from '../../helpers/minesweeper';
 import { MinesweeperService } from '../../services/minesweeper.service';
 import { SpinnerService } from '../../services/spinner.service';
 
@@ -11,9 +12,9 @@ import { SpinnerService } from '../../services/spinner.service';
 })
 export class MinesweeperComponent implements OnInit {
 
+  finished = false;
   grid: Array<Array<string>>;
   levels: Array<number>;
-  lose =  false;
   ready = false;
   started = false;
 
@@ -41,12 +42,15 @@ export class MinesweeperComponent implements OnInit {
     this.spinnerService.start();
 
     try {
-      const sussess: boolean = await this.minesweeperService.open(row, col);
+      const result: string = await this.minesweeperService.open(row, col);
       this.grid = this.minesweeperService.grid;
 
-      if (!sussess) {
-        this.lose = true;
-        alert('You lose');
+      switch (this.minesweeperService.status) {
+        case MinesweeperStatus.Lose:
+        case MinesweeperStatus.Win:
+          this.finished = true;
+          alert(result);
+          break;
       }
     } finally {
       this.spinnerService.stop();

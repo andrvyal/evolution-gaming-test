@@ -9,6 +9,7 @@ import { SocketApiService } from './socket-api.service';
 export class MinesweeperService {
 
   private map: Array<Array<string>>;
+  private responseStatus: MinesweeperStatus;
 
   constructor(
     private socketApiService: SocketApiService,
@@ -26,13 +27,21 @@ export class MinesweeperService {
     return cell === MinesweeperCell.Mine;
   }
 
-  async open(row: number, col: number): Promise<boolean> {
+  async open(row: number, col: number): Promise<string> {
     const response: string = await this.socketApiService.run(`${MinesweeperCommand.Open} ${col} ${row}`);
     await this.retrieveMap();
 
-    const sussess: boolean = (response === `${MinesweeperCommand.Open}: ${MinesweeperStatus.Success}`);
+    const result: string = response.replace(`${MinesweeperCommand.Open}: `, '');
 
-    return sussess;
+    if (result.indexOf(MinesweeperStatus.Ok) === 0) {
+      this.responseStatus = MinesweeperStatus.Ok;
+    } else if (result.indexOf(MinesweeperStatus.Lose) === 0) {
+      this.responseStatus = MinesweeperStatus.Lose;
+    } else if (result.indexOf(MinesweeperStatus.Win) === 0) {
+      this.responseStatus = MinesweeperStatus.Win;
+    }
+
+    return result;
   }
 
   get ready(): Promise<void> {
@@ -46,18 +55,19 @@ export class MinesweeperService {
     this.map = mapLines.map((line: string) => {
       return line.split('');
     });
-    //
-    console.log('map', this.map);
-    //
   }
 
   async start(level: number): Promise<void> {
     const response: string = await this.socketApiService.run(`${MinesweeperCommand.New} ${level}`);
 
-    if (response !== `${MinesweeperCommand.New}: ${MinesweeperStatus.Success}`) {
+    if (response !== `${MinesweeperCommand.New}: ${MinesweeperStatus.Ok}`) {
       return Promise.reject(response);
     }
 
     await this.retrieveMap();
+  }
+
+  get status(): MinesweeperStatus {
+    return this.responseStatus;
   }
 }

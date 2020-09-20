@@ -17,7 +17,7 @@
 
   <div *ngIf="started">
     <egt-minesweeper-grid
-      [disabled]="lose"
+      [disabled]="finished"
       [grid]="grid"
       (cellOpen)="open($event)"
     ></egt-minesweeper-grid>

@@ -11,5 +11,6 @@ export enum MinesweeperCommand {
 
 export enum MinesweeperStatus {
   Lose = 'You lose',
-  Success = 'OK',
+  Ok = 'OK',
+  Win = 'You win',
 }
