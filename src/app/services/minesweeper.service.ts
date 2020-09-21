@@ -19,16 +19,18 @@ export class MinesweeperService {
     return JSON.parse(JSON.stringify(this.map));
   }
 
-  isClosed(cell: string): boolean {
+  isClosed(rowIndex: number, colIndex: number): boolean {
+    const cell: string = this.map[rowIndex][colIndex];
     return cell === MinesweeperCell.Closed;
   }
 
-  isMine(cell: string): boolean {
+  isMine(rowIndex: number, colIndex: number): boolean {
+    const cell: string = this.map[rowIndex][colIndex];
     return cell === MinesweeperCell.Mine;
   }
 
-  async open(row: number, col: number): Promise<string> {
-    const response: string = await this.socketApiService.run(`${MinesweeperCommand.Open} ${col} ${row}`);
+  async open(rowIndex: number, colIndex: number): Promise<string> {
+    const response: string = await this.socketApiService.run(`${MinesweeperCommand.Open} ${colIndex} ${rowIndex}`);
     await this.retrieveMap();
 
     const result: string = response.replace(`${MinesweeperCommand.Open}: `, '');

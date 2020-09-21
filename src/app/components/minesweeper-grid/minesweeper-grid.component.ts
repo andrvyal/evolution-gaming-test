@@ -20,19 +20,19 @@ export class MinesweeperGridComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  isClosed(cell): boolean {
-    return this.minesweeperService.isClosed(cell);
+  isClosed(rowIndex: number, colIndex: number): boolean {
+    return this.minesweeperService.isClosed(rowIndex, colIndex);
   }
 
-  isMine(cell): boolean {
-    return this.minesweeperService.isMine(cell);
+  isMine(rowIndex: number, colIndex: number): boolean {
+    return this.minesweeperService.isMine(rowIndex, colIndex);
   }
 
-  open(row: number, col: number): void {
-    const cell: string = this.grid[row][col];
+  open(rowIndex: number, colIndex: number): void {
+    const cell: string = this.grid[rowIndex][colIndex];
 
-    if (this.isClosed(cell)) {
-      this.cellOpen.emit([row, col]);
+    if (this.isClosed(rowIndex, colIndex)) {
+      this.cellOpen.emit([rowIndex, colIndex]);
     }
   }
 }

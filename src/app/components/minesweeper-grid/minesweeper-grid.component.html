@@ -1,13 +1,13 @@
 <div class="grid">
-  <div *ngFor="let line of grid; let rowIndex = index" class="line">
+  <div *ngFor="let row of grid; let rowIndex = index" class="line">
     <button
-      *ngFor="let cell of line; let colIndex = index"
+      *ngFor="let cell of row; let colIndex = index"
       class="cell"
       type="button"
       [ngClass]="{
-        'closed': isClosed(cell),
-        'open': !isClosed(cell),
-        'mine': isMine(cell)
+        'closed': isClosed(rowIndex, colIndex),
+        'open': !isClosed(rowIndex, colIndex),
+        'mine': isMine(rowIndex, colIndex)
       }"
       [disabled]="disabled"
       (click)="open(rowIndex, colIndex)"

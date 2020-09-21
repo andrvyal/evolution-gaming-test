@@ -46,7 +46,7 @@ export class MinesweeperComponent implements OnInit {
       for (let colIndex = 0; colIndex < row.length; ++colIndex) {
         const cell: string = row[colIndex];
 
-        if (this.minesweeperService.isClosed(cell)) {
+        if (this.minesweeperService.isClosed(rowIndex, colIndex)) {
           this.open([rowIndex, colIndex]);
           return;
         }
@@ -62,11 +62,11 @@ export class MinesweeperComponent implements OnInit {
     }
   }
 
-  async open([row, col]: Array<number>): Promise<void> {
+  async open([rowIndex, colIndex]: Array<number>): Promise<void> {
     this.spinnerService.start();
 
     try {
-      const result: string = await this.minesweeperService.open(row, col);
+      const result: string = await this.minesweeperService.open(rowIndex, colIndex);
       this.grid = this.minesweeperService.grid;
 
       switch (this.minesweeperService.status) {
