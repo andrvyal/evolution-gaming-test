@@ -16,6 +16,19 @@
   </div>
 
   <div *ngIf="started">
+    <div class="automated-switch custom-control custom-switch">
+      <input
+        id="automatedCheckbox"
+        class="custom-control-input"
+        type="checkbox"
+        [disabled]="finished"
+        [checked]="automated"
+        (change)="onAutomatedChange(!automated)"
+      >
+
+      <label class="custom-control-label" for="automatedCheckbox">Automated</label>
+    </div>
+
     <egt-minesweeper-grid
       [disabled]="finished"
       [grid]="grid"

@@ -12,6 +12,7 @@ import { SpinnerService } from '../../services/spinner.service';
 })
 export class MinesweeperComponent implements OnInit {
 
+  automated = false;
   finished = false;
   grid: Array<Array<string>>;
   levels: Array<number>;
@@ -38,6 +39,29 @@ export class MinesweeperComponent implements OnInit {
     }
   }
 
+  private nextMove(): void {
+    for (let rowIndex = 0; rowIndex < this.grid.length; ++rowIndex) {
+      const row: Array<string> = this.grid[rowIndex];
+
+      for (let colIndex = 0; colIndex < row.length; ++colIndex) {
+        const cell: string = row[colIndex];
+
+        if (this.minesweeperService.isClosed(cell)) {
+          this.open([rowIndex, colIndex]);
+          return;
+        }
+      }
+    }
+  }
+
+  onAutomatedChange(automated: boolean): void {
+    this.automated = automated;
+
+    if (this.automated) {
+      this.nextMove();
+    }
+  }
+
   async open([row, col]: Array<number>): Promise<void> {
     this.spinnerService.start();
 
@@ -46,6 +70,11 @@ export class MinesweeperComponent implements OnInit {
       this.grid = this.minesweeperService.grid;
 
       switch (this.minesweeperService.status) {
+        case MinesweeperStatus.Ok:
+          if (this.automated) {
+            this.nextMove();
+          }
+          break;
         case MinesweeperStatus.Lose:
         case MinesweeperStatus.Win:
           this.finished = true;
