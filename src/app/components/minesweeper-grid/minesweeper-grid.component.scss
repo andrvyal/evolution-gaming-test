@@ -50,7 +50,12 @@ $cell-z-index: 0;
     }
   }
 
-  .open {
+  &.flag {
+    background-color: $yellow-light;
+    color: $yellow-dark;
+  }
+
+  &.open {
     background-color: $white;
     color: $gray-dark;
   }

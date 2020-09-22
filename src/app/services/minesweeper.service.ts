@@ -8,6 +8,7 @@ import { SocketApiService } from './socket-api.service';
 })
 export class MinesweeperService {
 
+  private flags: Array<Array<boolean>>;
   private map: Array<Array<string>>;
   private responseStatus: MinesweeperStatus;
 
@@ -19,9 +20,32 @@ export class MinesweeperService {
     return JSON.parse(JSON.stringify(this.map));
   }
 
+  get height(): number {
+    return this.map.length;
+  }
+
+  private initFlags(): void {
+    this.flags = [];
+
+    for (let rowIndex = 0; rowIndex < this.height; ++rowIndex) {
+      const row: Array<boolean> = [];
+
+      for (let colIndex = 0; colIndex < this.width; ++colIndex) {
+        row.push(false);
+      }
+
+      this.flags.push(row);
+    }
+  }
+
   isClosed(rowIndex: number, colIndex: number): boolean {
     const cell: string = this.map[rowIndex][colIndex];
     return cell === MinesweeperCell.Closed;
+  }
+
+  isFlagged(rowIndex: number, colIndex: number): boolean {
+    const flag: boolean = this.flags[rowIndex][colIndex];
+    return flag;
   }
 
   isMine(rowIndex: number, colIndex: number): boolean {
@@ -67,9 +91,18 @@ export class MinesweeperService {
     }
 
     await this.retrieveMap();
+    this.initFlags();
   }
 
   get status(): MinesweeperStatus {
     return this.responseStatus;
+  }
+
+  toggleFlag(rowIndex: number, colIndex: number): void {
+    this.flags[rowIndex][colIndex] = !this.flags[rowIndex][colIndex];
+  }
+
+  get width(): number {
+    return this.map[0].length;
   }
 }

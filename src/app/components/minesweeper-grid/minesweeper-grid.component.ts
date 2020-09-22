@@ -24,6 +24,10 @@ export class MinesweeperGridComponent implements OnInit {
     return this.minesweeperService.isClosed(rowIndex, colIndex);
   }
 
+  isFlagged(rowIndex: number, colIndex: number): boolean {
+    return this.minesweeperService.isFlagged(rowIndex, colIndex);
+  }
+
   isMine(rowIndex: number, colIndex: number): boolean {
     return this.minesweeperService.isMine(rowIndex, colIndex);
   }
@@ -31,8 +35,15 @@ export class MinesweeperGridComponent implements OnInit {
   open(rowIndex: number, colIndex: number): void {
     const cell: string = this.grid[rowIndex][colIndex];
 
-    if (this.isClosed(rowIndex, colIndex)) {
+    if (this.isClosed(rowIndex, colIndex) && !this.isFlagged(rowIndex, colIndex)) {
       this.cellOpen.emit([rowIndex, colIndex]);
+    }
+  }
+
+  toggleFlag(event: MouseEvent, rowIndex: number, colIndex: number): void {
+    if (event.button === 2) { // check if right button
+      event.preventDefault();
+      this.minesweeperService.toggleFlag(rowIndex, colIndex);
     }
   }
 }
