@@ -5,16 +5,16 @@
       class="cell"
       type="button"
       [ngClass]="{
-        'closed': isClosed(rowIndex, colIndex) && !isFlagged(rowIndex, colIndex),
-        'flag': isClosed(rowIndex, colIndex) && isFlagged(rowIndex, colIndex),
-        'open': !isClosed(rowIndex, colIndex),
+        'unknown': isUnknown(rowIndex, colIndex),
+        'flag': isFlagged(rowIndex, colIndex),
+        'open': isOpen(rowIndex, colIndex),
         'mine': isMine(rowIndex, colIndex)
       }"
       [disabled]="disabled"
       (click)="open(rowIndex, colIndex)"
       (contextmenu)="toggleFlag($event, rowIndex, colIndex)"
     >
-      {{isClosed(rowIndex, colIndex) && isFlagged(rowIndex, colIndex) ? '!' : cell}}
+      {{isFlagged(rowIndex, colIndex) ? '!' : cell}}
     </button>
   </div>
 </div>

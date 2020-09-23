@@ -38,19 +38,33 @@ export class MinesweeperService {
     }
   }
 
-  isClosed(rowIndex: number, colIndex: number): boolean {
+  private isClosed(rowIndex: number, colIndex: number): boolean {
     const cell: string = this.map[rowIndex][colIndex];
     return cell === MinesweeperCell.Closed;
   }
 
   isFlagged(rowIndex: number, colIndex: number): boolean {
-    const flag: boolean = this.flags[rowIndex][colIndex];
-    return flag;
+    const closed: boolean = this.isClosed(rowIndex, colIndex);
+    const flagged: boolean = this.flags[rowIndex][colIndex];
+
+    return closed && flagged;
   }
 
   isMine(rowIndex: number, colIndex: number): boolean {
     const cell: string = this.map[rowIndex][colIndex];
     return cell === MinesweeperCell.Mine;
+  }
+
+  isOpen(rowIndex: number, colIndex: number): boolean {
+    const closed: boolean = this.isClosed(rowIndex, colIndex);
+    return !closed;
+  }
+
+  isUnknown(rowIndex: number, colIndex: number): boolean {
+    const closed: boolean = this.isClosed(rowIndex, colIndex);
+    const flagged: boolean = this.isFlagged(rowIndex, colIndex);
+
+    return closed && !flagged;
   }
 
   async open(rowIndex: number, colIndex: number): Promise<string> {

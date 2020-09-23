@@ -20,10 +20,6 @@ export class MinesweeperGridComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  isClosed(rowIndex: number, colIndex: number): boolean {
-    return this.minesweeperService.isClosed(rowIndex, colIndex);
-  }
-
   isFlagged(rowIndex: number, colIndex: number): boolean {
     return this.minesweeperService.isFlagged(rowIndex, colIndex);
   }
@@ -32,10 +28,16 @@ export class MinesweeperGridComponent implements OnInit {
     return this.minesweeperService.isMine(rowIndex, colIndex);
   }
 
-  open(rowIndex: number, colIndex: number): void {
-    const cell: string = this.grid[rowIndex][colIndex];
+  isOpen(rowIndex: number, colIndex: number): boolean {
+    return this.minesweeperService.isOpen(rowIndex, colIndex);
+  }
 
-    if (this.isClosed(rowIndex, colIndex) && !this.isFlagged(rowIndex, colIndex)) {
+  isUnknown(rowIndex: number, colIndex: number): boolean {
+    return this.minesweeperService.isUnknown(rowIndex, colIndex);
+  }
+
+  open(rowIndex: number, colIndex: number): void {
+    if (this.isUnknown(rowIndex, colIndex)) {
       this.cellOpen.emit([rowIndex, colIndex]);
     }
   }

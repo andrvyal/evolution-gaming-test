@@ -44,9 +44,7 @@ export class MinesweeperComponent implements OnInit {
       const row: Array<string> = this.grid[rowIndex];
 
       for (let colIndex = 0; colIndex < row.length; ++colIndex) {
-        const cell: string = row[colIndex];
-
-        if (this.minesweeperService.isClosed(rowIndex, colIndex)) {
+        if (this.minesweeperService.isUnknown(rowIndex, colIndex)) {
           this.open([rowIndex, colIndex]);
           return;
         }
