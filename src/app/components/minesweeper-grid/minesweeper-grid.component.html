@@ -4,6 +4,8 @@
       *ngFor="let cell of row; let colIndex = index"
       class="cell"
       type="button"
+      [attr.data-row]="rowIndex"
+      [attr.data-col]="colIndex"
       [ngClass]="{
         'unknown': isUnknown(rowIndex, colIndex),
         'flag': isFlagged(rowIndex, colIndex),

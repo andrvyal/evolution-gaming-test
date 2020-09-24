@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { group } from 'console';
 
 import { environment } from '../../../environments/environment';
 import { MinesweeperCell, MinesweeperCellCoordinates, MinesweeperCellGroup, MinesweeperStatus } from '../../helpers/minesweeper';
@@ -110,6 +111,89 @@ export class MinesweeperComponent implements OnInit {
     return unknownNeighbors;
   }
 
+  private hasCell(cells: Array<MinesweeperCellCoordinates>, targetCell: MinesweeperCellCoordinates): boolean {
+    for (const cell of cells) {
+      if (this.isCellEqual(cell, targetCell)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private intersectGroups(group1: MinesweeperCellGroup, group2: MinesweeperCellGroup): MinesweeperCellGroup {
+    let parent: MinesweeperCellGroup;
+    let child: MinesweeperCellGroup;
+
+    if (group1.mines > group2.mines) {
+      parent = group1;
+      child = group2;
+    } else {
+      parent = group2;
+      child = group1;
+    }
+
+    const intersection: MinesweeperCellGroup = {
+      cells: [],
+      mines: 0,
+    };
+
+    for (const cell of group1.cells) {
+      if (this.hasCell(group2.cells, cell)) {
+        intersection.cells.push(cell);
+      }
+    }
+
+    intersection.mines = parent.mines - (child.cells.length - intersection.cells.length);
+
+    return intersection;
+  }
+
+  private isCellEqual(cell1: MinesweeperCellCoordinates, cell2: MinesweeperCellCoordinates): boolean {
+    return (
+      cell1.rowIndex === cell2.rowIndex &&
+      cell1.colIndex === cell2.colIndex
+    );
+  }
+
+  private isGroupsEqual(group1: MinesweeperCellGroup, group2: MinesweeperCellGroup): boolean {
+    if (group1.cells.length !== group1.cells.length) {
+      return false;
+    }
+
+    for (const cell of group1.cells) {
+      if (!this.hasCell(group2.cells, cell)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private isIntersectedGroups(group1: MinesweeperCellGroup, group2: MinesweeperCellGroup): boolean {
+    for (const cell of group1.cells) {
+      if (this.hasCell(group2.cells, cell)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private isParentChildGroups(parent: MinesweeperCellGroup, child: MinesweeperCellGroup): boolean {
+    if (parent.cells.length <= child.cells.length) {
+      return false;
+    }
+
+    for (const cell of child.cells) {
+      if (!this.hasCell(parent.cells, cell)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   private nextMove(): void {
     setTimeout(() => {
       let flagsSet: boolean;
@@ -211,6 +295,7 @@ export class MinesweeperComponent implements OnInit {
     let flagsSet = false;
     const groups: Array<MinesweeperCellGroup> = [];
 
+    // build groups
     this.minesweeperService.forEach((rowIndex: number, colIndex: number) => {
       if (this.minesweeperService.isOpen(rowIndex, colIndex)) {
         const unknownAround: Array<MinesweeperCellCoordinates> = this.getUnknownAround(rowIndex, colIndex);
@@ -224,16 +309,76 @@ export class MinesweeperComponent implements OnInit {
             groups.push({
               cells: unknownAround,
               mines: unknownMines,
+              source: {rowIndex, colIndex},
             });
           }
         }
       }
     });
 
+    // process and clean up groups
+    let repeat: boolean;
+
+    do {
+        repeat = false;
+
+        for (let groupIndex1 = 0; groupIndex1 < groups.length; ++groupIndex1) {
+          for (let groupIndex2 = groupIndex1 + 1; groupIndex2 < groups.length; ++groupIndex2) {
+            const group1: MinesweeperCellGroup = groups[groupIndex1];
+            const group2: MinesweeperCellGroup = groups[groupIndex2];
+
+            if (this.isGroupsEqual(group1, group2)) {
+              groups.splice(groupIndex2, 1);
+              break;
+            }
+
+            if (this.isParentChildGroups(group1, group2)) {
+              const difference: MinesweeperCellGroup = this.subtractGroup(group1, group2);
+              difference.operator = 'difference';
+              difference.operatorGroups = [group1, group2];
+
+              groups[groupIndex1] = difference;
+              repeat = true;
+            } else if (this.isParentChildGroups(group2, group1)) {
+              const difference: MinesweeperCellGroup = this.subtractGroup(group2, group1);
+              difference.operator = 'difference';
+              difference.operatorGroups = [group2, group1];
+
+              groups[groupIndex2] = difference;
+              repeat = true;
+            } else if (this.isIntersectedGroups(group1, group2)) {
+              const intersection: MinesweeperCellGroup = this.intersectGroups(group1, group2);
+              intersection.operator = 'intersection';
+              intersection.operatorGroups = [group1, group2];
+
+              if (intersection.mines === Math.min(group1.mines, group2.mines)) {
+                const difference1: MinesweeperCellGroup = this.subtractGroup(group1, intersection);
+                const difference2: MinesweeperCellGroup = this.subtractGroup(group2, intersection);
+                difference1.operator = 'intersection difference';
+                difference1.operatorGroups = [group1, group2, intersection];
+                difference2.operator = 'intersection difference';
+                difference2.operatorGroups = [group1, group2, intersection];
+
+                groups[groupIndex1] = difference1;
+                groups[groupIndex2] = difference2;
+
+                groups.push(intersection);
+
+                repeat = true;
+              }
+            }
+          }
+        }
+    } while (repeat);
+
+    console.log('FLAGS');
+
+    // set flags
     for (const group of groups) {
       if (group.cells.length === group.mines) {
         for (const cell of group.cells) {
           if (!this.minesweeperService.isFlagged(cell.rowIndex, cell.colIndex)) {
+            console.log(group);
             this.minesweeperService.toggleFlag(cell.rowIndex, cell.colIndex);
             flagsSet = true;
           }
@@ -255,5 +400,20 @@ export class MinesweeperComponent implements OnInit {
     } finally {
       this.spinnerService.stop();
     }
+  }
+
+  private subtractGroup(from: MinesweeperCellGroup, minus: MinesweeperCellGroup): MinesweeperCellGroup {
+    const difference: MinesweeperCellGroup = {
+      cells: [],
+      mines: from.mines - minus.mines,
+    };
+
+    for (const cell of from.cells) {
+      if (!this.hasCell(minus.cells, cell)) {
+        difference.cells.push(cell);
+      }
+    }
+
+    return difference;
   }
 }

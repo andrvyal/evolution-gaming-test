@@ -11,6 +11,9 @@ export interface MinesweeperCellCoordinates {
 export interface MinesweeperCellGroup {
   cells: Array<MinesweeperCellCoordinates>;
   mines: number;
+  source?: MinesweeperCellCoordinates;
+  operator?: string;
+  operatorGroups?: Array<MinesweeperCellGroup>;
 }
 
 export enum MinesweeperCommand {
