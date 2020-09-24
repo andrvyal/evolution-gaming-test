@@ -16,6 +16,27 @@ export class MinesweeperService {
     private socketApiService: SocketApiService,
   ) { }
 
+  forEach(callback: (rowIndex: number, colIndex: number) => void): void {
+    for (let rowIndex = 0; rowIndex < this.map.length; ++rowIndex) {
+      const row: Array<string> = this.map[rowIndex];
+
+      for (let colIndex = 0; colIndex < row.length; ++colIndex) {
+        callback.bind(this)(rowIndex, colIndex);
+      }
+    }
+  }
+
+  getValue(rowIndex: number, colIndex: number): number {
+    if (!this.isOpen(rowIndex, colIndex)) {
+      throw new Error(`${colIndex} ${rowIndex} is not open yet`);
+    } else if (this.isMine(rowIndex, colIndex)) {
+      throw new Error(`${colIndex} ${rowIndex} is mine`);
+    } else {
+      const cell: string = this.map[rowIndex][colIndex];
+      return Number(cell);
+    }
+  }
+
   get grid(): Array<Array<string>> {
     return JSON.parse(JSON.stringify(this.map));
   }

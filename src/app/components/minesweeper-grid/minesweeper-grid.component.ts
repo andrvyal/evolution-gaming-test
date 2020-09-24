@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
+import { MinesweeperCellCoordinates } from '../../helpers/minesweeper';
 import { MinesweeperService } from '../../services/minesweeper.service';
 
 @Component({
@@ -11,7 +12,7 @@ export class MinesweeperGridComponent implements OnInit {
   @Input() disabled: boolean;
   @Input() grid: Array<Array<string>>;
 
-  @Output() cellOpen: EventEmitter<Array<number>> = new EventEmitter<Array<number>>();
+  @Output() cellOpen: EventEmitter<MinesweeperCellCoordinates> = new EventEmitter<MinesweeperCellCoordinates>();
 
   constructor(
     private minesweeperService: MinesweeperService,
@@ -38,7 +39,9 @@ export class MinesweeperGridComponent implements OnInit {
 
   open(rowIndex: number, colIndex: number): void {
     if (this.isUnknown(rowIndex, colIndex)) {
-      this.cellOpen.emit([rowIndex, colIndex]);
+      this.cellOpen.emit({
+        rowIndex, colIndex,
+      });
     }
   }
 
