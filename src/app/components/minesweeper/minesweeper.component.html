@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div *ngIf="started">
+  <div *ngIf="started" class="game">
     <div class="automated-switch custom-control custom-switch">
       <input
         id="automatedCheckbox"
@@ -29,10 +29,16 @@
       <label class="custom-control-label" for="automatedCheckbox">Automated</label>
     </div>
 
-    <egt-minesweeper-grid
-      [disabled]="finished"
-      [grid]="grid"
-      (cellOpen)="open($event)"
-    ></egt-minesweeper-grid>
+    <div class="grid">
+      <div class="scrollable">
+        <egt-minesweeper-grid
+          [disabled]="finished"
+          [grid]="grid"
+          (cellOpen)="open($event)"
+        ></egt-minesweeper-grid>
+      </div>
+  
+      <egt-spinner *ngIf="!finished && (opening || automated)"></egt-spinner>
+    </div>
   </div>
 </div>

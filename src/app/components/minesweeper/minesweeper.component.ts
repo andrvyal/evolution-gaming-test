@@ -16,6 +16,7 @@ export class MinesweeperComponent implements OnInit {
   finished = false;
   grid: Array<Array<string>>;
   levels: Array<number>;
+  opening = false;
   ready = false;
   started = false;
 
@@ -110,13 +111,15 @@ export class MinesweeperComponent implements OnInit {
   }
 
   private nextMove(): void {
-    let flagsSet: boolean;
+    setTimeout(() => {
+      let flagsSet: boolean;
 
-    do {
-      flagsSet = this.setFlags();
-    } while (flagsSet);
+      do {
+        flagsSet = this.setFlags();
+      } while (flagsSet);
 
-    this.openNext();
+      this.openNext();
+    });
   }
 
   onAutomatedChange(automated: boolean): void {
@@ -128,7 +131,7 @@ export class MinesweeperComponent implements OnInit {
   }
 
   async open({rowIndex, colIndex}: MinesweeperCellCoordinates): Promise<void> {
-    this.spinnerService.start();
+    this.opening = true;
 
     try {
       const result: string = await this.minesweeperService.open(rowIndex, colIndex);
@@ -143,11 +146,15 @@ export class MinesweeperComponent implements OnInit {
         case MinesweeperStatus.Lose:
         case MinesweeperStatus.Win:
           this.finished = true;
-          alert(result);
+
+          setTimeout(() => {
+            alert(result);
+          });
+
           break;
       }
     } finally {
-      this.spinnerService.stop();
+      this.opening = false;
     }
   }
 

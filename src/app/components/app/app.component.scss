@@ -1,0 +1,10 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.minesweeper {
+    flex-grow: 1;
+    position: relative;
+}
