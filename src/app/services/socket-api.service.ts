@@ -19,15 +19,31 @@ export class SocketApiService {
         resolve();
       });
 
+      this.socket.addEventListener('close', (event: MessageEvent) => {
+        this.handleClose(event);
+      });
+
+      this.socket.addEventListener('error', (event: MessageEvent) => {
+        this.handleError(event);
+      });
+
       this.socket.addEventListener('message', (event: MessageEvent) => {
-        this.handleMessage(event.data);
+        this.handleMessage(event);
       });
     });
   }
 
-  private handleMessage(data: string): void {
+  private handleClose(event: MessageEvent): void {
+    alert('Connection interrupted');
+  }
+
+  private handleError(event: MessageEvent): void {
+    alert('Connection error');
+  }
+
+  private handleMessage(event: MessageEvent): void {
     if (this.actionResolve) {
-      this.actionResolve(data);
+      this.actionResolve(event.data);
       this.actionResolve = null;
     }
   }
