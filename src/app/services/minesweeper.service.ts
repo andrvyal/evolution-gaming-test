@@ -26,6 +26,26 @@ export class MinesweeperService {
     }
   }
 
+  forEachAround(originRowIndex: number, originColIndex: number, callback: (rowIndex: number, colIndex: number) => void): void {
+    const fromRow: number = Math.max(originRowIndex - 1, 0);
+    const toRow: number = Math.min(originRowIndex + 1, this.map.length - 1);
+
+    for (let rowIndex = fromRow; rowIndex <= toRow; ++rowIndex) {
+      const row: Array<string> = this.map[rowIndex];
+
+      const fromCol: number = Math.max(originColIndex - 1, 0);
+      const toCol: number = Math.min(originColIndex + 1, row.length - 1);
+
+      for (let colIndex = fromCol; colIndex <= toCol; ++colIndex) {
+        if (rowIndex === originRowIndex && colIndex === originColIndex) {
+          continue;
+        }
+
+        callback.bind(this)(rowIndex, colIndex);
+      }
+    }
+  }
+
   getValue(rowIndex: number, colIndex: number): number {
     if (!this.isOpen(rowIndex, colIndex)) {
       throw new Error(`${colIndex} ${rowIndex} is not open yet`);
