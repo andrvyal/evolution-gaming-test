@@ -15,19 +15,30 @@
     </div>
   </div>
 
-  <div *ngIf="started">
+  <div *ngIf="started" class="game">
+    <div class="automated-switch custom-control custom-switch">
+      <input
+        id="automatedCheckbox"
+        class="custom-control-input"
+        type="checkbox"
+        [disabled]="finished"
+        [checked]="automated"
+        (change)="onAutomatedChange(!automated)"
+      >
+
+      <label class="custom-control-label" for="automatedCheckbox">Automated</label>
+    </div>
+
     <div class="grid">
-      <div *ngFor="let line of grid; let rowIndex = index" class="line">
-        <button
-          *ngFor="let cell of line; let colIndex = index"
-          class="cell"
-          type="button"
-          [disabled]="lose"
-          (click)="open(rowIndex, colIndex)"
-        >
-          {{cell}}
-        </button>
+      <div class="scrollable">
+        <egt-minesweeper-grid
+          [disabled]="finished"
+          [grid]="grid"
+          (cellOpen)="open($event)"
+        ></egt-minesweeper-grid>
       </div>
+  
+      <egt-spinner *ngIf="!finished && (opening || automated)"></egt-spinner>
     </div>
   </div>
 </div>

@@ -1,47 +1,34 @@
+@import '../../../styles/utils/mixins';
+@import '../../../styles/utils/palette';
+
 .intro {
-    margin-right: 1.25rem;
+  margin-right: 1.25rem;
+}
+
+.automated-switch {
+  margin-bottom: .75rem;
+}
+
+.game {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
 }
 
 .grid {
-    display: inline-block;
+  flex-grow: 1;
+  position: relative;
+  width: 100%;
 }
 
-.line {
-    display: flex;
-
-    & ~ & .cell {
-        margin-top: -1px;
-    }
-}
-
-.cell {
-    background-color: #ffffff;
-    border: 1px solid #6c757d;
-    color: #6c757d;
-    height: 1.75rem;
-    min-width: 1.75rem;
-    overflow: hidden;
-    padding: 0;
-    position: relative;
-    text-align: center;
-    width: 1.75rem;
-    z-index: 0;
-
-    & ~ & {
-        margin-left: -1px;
-    }
-
-    &:not(:disabled) {
-        &:hover {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: #fff;
-            z-index: 1;
-        }
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: .5;
-    }
+.scrollable {
+  left: 50%;
+  max-height: 100%;
+  max-width: 100%;
+  overflow: auto;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }

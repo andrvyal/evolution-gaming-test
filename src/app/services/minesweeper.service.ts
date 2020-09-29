@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Command, Status } from '../helpers/minesweeper';
+import { MinesweeperCell, MinesweeperCommand, MinesweeperStatus } from '../helpers/minesweeper';
 import { SocketApiService } from './socket-api.service';
 
 @Injectable({
@@ -8,23 +8,121 @@ import { SocketApiService } from './socket-api.service';
 })
 export class MinesweeperService {
 
+  private flags: Array<Array<boolean>>;
   private map: Array<Array<string>>;
+  private responseStatus: MinesweeperStatus;
 
   constructor(
     private socketApiService: SocketApiService,
   ) { }
 
+  forEach(callback: (rowIndex: number, colIndex: number) => void): void {
+    for (let rowIndex = 0; rowIndex < this.map.length; ++rowIndex) {
+      const row: Array<string> = this.map[rowIndex];
+
+      for (let colIndex = 0; colIndex < row.length; ++colIndex) {
+        callback.bind(this)(rowIndex, colIndex);
+      }
+    }
+  }
+
+  forEachAround(originRowIndex: number, originColIndex: number, callback: (rowIndex: number, colIndex: number) => void): void {
+    const fromRow: number = Math.max(originRowIndex - 1, 0);
+    const toRow: number = Math.min(originRowIndex + 1, this.map.length - 1);
+
+    for (let rowIndex = fromRow; rowIndex <= toRow; ++rowIndex) {
+      const row: Array<string> = this.map[rowIndex];
+
+      const fromCol: number = Math.max(originColIndex - 1, 0);
+      const toCol: number = Math.min(originColIndex + 1, row.length - 1);
+
+      for (let colIndex = fromCol; colIndex <= toCol; ++colIndex) {
+        if (rowIndex === originRowIndex && colIndex === originColIndex) {
+          continue;
+        }
+
+        callback.bind(this)(rowIndex, colIndex);
+      }
+    }
+  }
+
+  getValue(rowIndex: number, colIndex: number): number {
+    if (!this.isOpen(rowIndex, colIndex)) {
+      throw new Error(`${colIndex} ${rowIndex} is not open yet`);
+    } else if (this.isMine(rowIndex, colIndex)) {
+      throw new Error(`${colIndex} ${rowIndex} is mine`);
+    } else {
+      const cell: string = this.map[rowIndex][colIndex];
+      return Number(cell);
+    }
+  }
+
   get grid(): Array<Array<string>> {
     return JSON.parse(JSON.stringify(this.map));
   }
 
-  async open(row: number, col: number): Promise<boolean> {
-    const response: string = await this.socketApiService.run(`${Command.Open} ${col} ${row}`);
+  get height(): number {
+    return this.map.length;
+  }
+
+  private initFlags(): void {
+    this.flags = [];
+
+    for (let rowIndex = 0; rowIndex < this.height; ++rowIndex) {
+      const row: Array<boolean> = [];
+
+      for (let colIndex = 0; colIndex < this.width; ++colIndex) {
+        row.push(false);
+      }
+
+      this.flags.push(row);
+    }
+  }
+
+  private isClosed(rowIndex: number, colIndex: number): boolean {
+    const cell: string = this.map[rowIndex][colIndex];
+    return cell === MinesweeperCell.Closed;
+  }
+
+  isFlagged(rowIndex: number, colIndex: number): boolean {
+    const closed: boolean = this.isClosed(rowIndex, colIndex);
+    const flagged: boolean = this.flags[rowIndex][colIndex];
+
+    return closed && flagged;
+  }
+
+  isMine(rowIndex: number, colIndex: number): boolean {
+    const cell: string = this.map[rowIndex][colIndex];
+    return cell === MinesweeperCell.Mine;
+  }
+
+  isOpen(rowIndex: number, colIndex: number): boolean {
+    const closed: boolean = this.isClosed(rowIndex, colIndex);
+    return !closed;
+  }
+
+  isUnknown(rowIndex: number, colIndex: number): boolean {
+    const closed: boolean = this.isClosed(rowIndex, colIndex);
+    const flagged: boolean = this.isFlagged(rowIndex, colIndex);
+
+    return closed && !flagged;
+  }
+
+  async open(rowIndex: number, colIndex: number): Promise<string> {
+    const response: string = await this.socketApiService.run(`${MinesweeperCommand.Open} ${colIndex} ${rowIndex}`);
     await this.retrieveMap();
 
-    const sussess: boolean = (response === `${Command.Open}: ${Status.Success}`);
+    const result: string = response.replace(`${MinesweeperCommand.Open}: `, '');
 
-    return sussess;
+    if (result.indexOf(MinesweeperStatus.Ok) === 0) {
+      this.responseStatus = MinesweeperStatus.Ok;
+    } else if (result.indexOf(MinesweeperStatus.Lose) === 0) {
+      this.responseStatus = MinesweeperStatus.Lose;
+    } else if (result.indexOf(MinesweeperStatus.Win) === 0) {
+      this.responseStatus = MinesweeperStatus.Win;
+    }
+
+    return result;
   }
 
   get ready(): Promise<void> {
@@ -32,24 +130,34 @@ export class MinesweeperService {
   }
 
   private async retrieveMap(): Promise<void> {
-    const mapResponse: string = await this.socketApiService.run(`${Command.Map}`);
+    const mapResponse: string = await this.socketApiService.run(`${MinesweeperCommand.Map}`);
     const mapLines: Array<string> = mapResponse.split('\n').slice(1, -1);
 
     this.map = mapLines.map((line: string) => {
       return line.split('');
     });
-    //
-    console.log('map', this.map);
-    //
   }
 
   async start(level: number): Promise<void> {
-    const response: string = await this.socketApiService.run(`${Command.New} ${level}`);
+    const response: string = await this.socketApiService.run(`${MinesweeperCommand.New} ${level}`);
 
-    if (response !== `${Command.New}: ${Status.Success}`) {
+    if (response !== `${MinesweeperCommand.New}: ${MinesweeperStatus.Ok}`) {
       return Promise.reject(response);
     }
 
     await this.retrieveMap();
+    this.initFlags();
+  }
+
+  get status(): MinesweeperStatus {
+    return this.responseStatus;
+  }
+
+  toggleFlag(rowIndex: number, colIndex: number): void {
+    this.flags[rowIndex][colIndex] = !this.flags[rowIndex][colIndex];
+  }
+
+  get width(): number {
+    return this.map[0].length;
   }
 }

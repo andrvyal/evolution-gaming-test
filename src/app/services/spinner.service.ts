@@ -13,24 +13,24 @@ export class SpinnerService {
   constructor() { }
 
   start(): void {
-      if (!this.count) {
-          this.stateChangeObserver.next(true);
-      }
+    if (!this.count) {
+      this.stateChangeObserver.next(true);
+    }
 
-      ++this.count;
+    ++this.count;
   }
 
   get stateChange(): Observable<boolean> {
-      return this.stateChangeObservable;
+    return this.stateChangeObservable;
   }
 
   stop(): void {
-      this.count = Math.max(this.count - 1, 0);
+    this.count = Math.max(this.count - 1, 0);
 
-      setTimeout(() => {
-          if (!this.count) {
-              this.stateChangeObserver.next(false);
-          }
-      });
+    setTimeout(() => {
+      if (!this.count) {
+        this.stateChangeObserver.next(false);
+      }
+    });
   }
 }

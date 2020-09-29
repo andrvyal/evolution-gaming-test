@@ -1,0 +1,20 @@
+<div class="grid">
+  <div *ngFor="let row of grid; let rowIndex = index" class="line">
+    <button
+      *ngFor="let cell of row; let colIndex = index"
+      class="cell"
+      type="button"
+      [ngClass]="{
+        'unknown': isUnknown(rowIndex, colIndex),
+        'flag': isFlagged(rowIndex, colIndex),
+        'open': isOpen(rowIndex, colIndex),
+        'mine': isMine(rowIndex, colIndex)
+      }"
+      [disabled]="disabled"
+      (click)="open(rowIndex, colIndex)"
+      (contextmenu)="toggleFlag($event, rowIndex, colIndex)"
+    >
+      {{isFlagged(rowIndex, colIndex) ? '!' : cell}}
+    </button>
+  </div>
+</div>
